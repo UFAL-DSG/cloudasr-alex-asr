@@ -7,7 +7,7 @@ RUN apt-get update && \
 
 ADD . /opt/app
 WORKDIR /opt/app
-RUN install.sh
+RUN bash install.sh
 
 
 # CMD while true; do python run.py; done
