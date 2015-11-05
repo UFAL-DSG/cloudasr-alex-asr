@@ -2,26 +2,18 @@ from math import *
 
 def create_asr():
     import config
-    from kaldi.utils import lattice_to_nbest, wst2dict
-    from kaldi.decoders import PyOnlineLatgenRecogniser
+    from kaldi2.utils import lattice_to_nbest, wst2dict
+    from kaldi2.decoders import cPyKaldi2Decoder
     from asr_utils import lattice_calibration
 
-    recogniser = PyOnlineLatgenRecogniser()
-    recogniser.setup(config.kaldi_config)
-    dictionary = wst2dict(config.wst_path)
+    recogniser = cPyKaldi2Decoder(config.model_path)
 
-    path_to_text = PathToText(dictionary)
-    to_nbest = ToNBest(path_to_text, lattice_to_nbest, lattice_calibration)
-    to_best_path = ToBestPath(path_to_text)
-
-    return ASR(recogniser, to_nbest, to_best_path)
+    return ASR(recogniser)
 
 class ASR:
 
-    def __init__(self, recogniser, to_nbest, to_best_path):
+    def __init__(self, recogniser):
         self.recogniser = recogniser
-        self.to_nbest = to_nbest
-        self.to_best_path = to_best_path
         self.decoded_frames = 0
         self.callbacks = []
 
@@ -41,7 +33,10 @@ class ASR:
             return (1.0, '')
         else:
             interim_result = self.recogniser.get_best_path()
-            return self.to_best_path(interim_result)
+            return self._tokens_to_words(interim_result)
+
+    def _tokens_to_words(self, tokens):
+        return [self.recogniser.get_word(x) for x in tokens]
 
     def get_final_hypothesis(self):
         if self.decoded_frames == 0:
@@ -53,6 +48,9 @@ class ASR:
 
         return self.to_nbest(lat, 10)
 
+    def _to_nbest(self):
+        return [(exp(-prob), self._tokens_to_words(path)) for (prob, path) in lattice_to_nbest(lattice_calibration(lattice), n=n)]
+
     def change_lm(self, lm):
         pass
 
@@ -63,32 +61,3 @@ class ASR:
     def call_callbacks(self):
         for callback in self.callbacks:
             callback()
-
-
-
-class ToNBest:
-
-    def __init__(self, path_to_text, lattice_to_nbest, lattice_calibration):
-        self.path_to_text = path_to_text
-        self.lattice_to_nbest = lattice_to_nbest
-        self.lattice_calibration = lattice_calibration
-
-    def __call__(self, lattice, n):
-        return [(exp(-prob), self.path_to_text(path)) for (prob, path) in self.lattice_to_nbest(self.lattice_calibration(lattice), n=n)]
-
-class ToBestPath:
-
-    def __init__(self, path_to_text):
-        self.path_to_text = path_to_text
-
-    def __call__(self, best_path):
-        (prob, path) = best_path
-        return (prob, self.path_to_text(path))
-
-class PathToText:
-
-    def __init__(self, dictionary):
-        self.dictionary = dictionary
-
-    def __call__(self, path):
-        return u' '.join([unicode(self.dictionary[w]) for w in path])
