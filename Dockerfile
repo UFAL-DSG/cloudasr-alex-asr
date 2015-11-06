@@ -5,4 +5,4 @@ ADD . /opt/app
 WORKDIR /opt/app
 RUN bash install.sh
 
-# CMD while true; do python run.py; done
+CMD while true; do python run.py; done
