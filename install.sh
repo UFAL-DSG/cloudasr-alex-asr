@@ -1,5 +1,7 @@
+#!/bin/bash
+
 apt-get update
-apt-get install -y build-essential libatlas-base-dev python-dev python-pip git wget gfortran g++
+apt-get install -y build-essential libatlas-base-dev python-dev python-pip git wget gfortran g++ unzip
 
 wget http://repo.continuum.io/miniconda/Miniconda2-3.18.3-Linux-x86_64.sh -O miniconda.sh
 chmod +x miniconda.sh
@@ -17,5 +19,5 @@ bash prepare_env.sh
 make
 make py
 python setup.py install
-cd ..
-rm -rf pykaldi2
+#cd ..
+#rm -rf pykaldi2

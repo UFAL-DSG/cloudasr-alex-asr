@@ -1,10 +1,11 @@
 from math import *
+from kaldi2.utils import lattice_to_nbest, wst2dict
+from kaldi2.decoders import cPyKaldi2Decoder
+from asr_utils import lattice_calibration
 
 def create_asr():
     import config
-    from kaldi2.utils import lattice_to_nbest, wst2dict
-    from kaldi2.decoders import cPyKaldi2Decoder
-    from asr_utils import lattice_calibration
+    
 
     recogniser = cPyKaldi2Decoder(config.model_path)
 
@@ -32,11 +33,12 @@ class ASR:
         if self.decoded_frames == 0:
             return (1.0, '')
         else:
-            interim_result = self.recogniser.get_best_path()
-            return self._tokens_to_words(interim_result)
+            p, interim_result = self.recogniser.get_best_path()
+            return p, self._tokens_to_words(interim_result)
 
     def _tokens_to_words(self, tokens):
-        return [self.recogniser.get_word(x) for x in tokens]
+        print tokens
+        return " ".join([self.recogniser.get_word(x).decode('utf8') for x in tokens])
 
     def get_final_hypothesis(self):
         if self.decoded_frames == 0:
@@ -46,9 +48,9 @@ class ASR:
         utt_lik, lat = self.recogniser.get_lattice()
         self.reset()
 
-        return self.to_nbest(lat, 10)
+        return self._to_nbest(lat, 10)
 
-    def _to_nbest(self):
+    def _to_nbest(self, lattice, n):
         return [(exp(-prob), self._tokens_to_words(path)) for (prob, path) in lattice_to_nbest(lattice_calibration(lattice), n=n)]
 
     def change_lm(self, lm):
@@ -56,7 +58,7 @@ class ASR:
 
     def reset(self):
         self.decoded_frames = 0
-        self.recogniser.reset(reset_pipeline=True)
+        self.recogniser.reset()
 
     def call_callbacks(self):
         for callback in self.callbacks:
