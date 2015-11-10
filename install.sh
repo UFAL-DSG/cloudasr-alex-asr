@@ -17,7 +17,6 @@ cd pykaldi2
 pip install -r requirements.txt
 bash prepare_env.sh
 make
-make py
 python setup.py install
 mv /root/miniconda2/lib/python2.7/site-packages/* /usr/lib/python2.7/dist-packages/
 mv /root/miniconda2/lib/* /usr/lib
