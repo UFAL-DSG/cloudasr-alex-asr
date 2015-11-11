@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 apt-get update
 apt-get install -y build-essential libatlas-base-dev python-dev python-pip git wget gfortran g++ unzip zlib1g-dev automake autoconf libtool subversion
@@ -20,5 +21,7 @@ make
 python setup.py install
 mv /root/miniconda2/lib/python2.7/site-packages/* /usr/lib/python2.7/dist-packages/
 mv /root/miniconda2/lib/* /usr/lib
-cd ..
-#rm -rf pykaldi2
+
+cd /
+python -c "import kaldi2.decoders"
+rm -rf pykaldi2  # Will remove only if everything was alright.
