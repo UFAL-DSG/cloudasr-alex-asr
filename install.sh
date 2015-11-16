@@ -22,6 +22,6 @@ python setup.py install
 mv /root/miniconda2/lib/python2.7/site-packages/* /usr/lib/python2.7/dist-packages/ || true
 mv /root/miniconda2/lib/* /usr/lib || true
 
-cd /
-python -c "import kaldi2.decoders"
-rm -rf pykaldi2  # Will remove only if everything was alright.
+#cd /
+#python -c "import kaldi2.decoders"
+#rm -rf pykaldi2  # Will remove only if everything was alright.
