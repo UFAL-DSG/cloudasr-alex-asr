@@ -12,16 +12,12 @@ conda update --yes conda
 
 conda install theano --yes
 
-
-git clone https://github.com/UFAL-DSG/pykaldi2.git
-cd pykaldi2
+git clone https://github.com/UFAL-DSG/alex-asr.git
+cd alex-asr
 pip install -r requirements.txt
 bash prepare_env.sh
 make
 python setup.py install
 mv /root/miniconda2/lib/python2.7/site-packages/* /usr/lib/python2.7/dist-packages/ || true
 mv /root/miniconda2/lib/* /usr/lib || true
-
-#cd /
-#python -c "import kaldi2.decoders"
-#rm -rf pykaldi2  # Will remove only if everything was alright.
+(source deactivate; cd /; python -c "from alex_asr import Decoder" && rm -rf alex-asr) || true  # Will remove only if everything was alright.

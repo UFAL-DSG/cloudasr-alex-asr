@@ -1,13 +1,13 @@
 from math import *
-from kaldi2.utils import lattice_to_nbest, wst2dict
-from kaldi2.decoders import cPyKaldi2Decoder
+from alex_asr.utils import lattice_to_nbest, wst2dict
+from alex_asr import Decoder
 from asr_utils import lattice_calibration
 
 def create_asr():
     import config
     
 
-    recogniser = cPyKaldi2Decoder(config.model_path)
+    recogniser = Decoder(config.model_path)
 
     return ASR(recogniser)
 
